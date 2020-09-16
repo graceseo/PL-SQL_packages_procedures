@@ -313,7 +313,7 @@ IS
     m_time_offset NUMBER;
     m_agency_id NUMBER := 19862;
     
-    --////////////ted_track_w¿¡¼­ÀÇ ¼öÁ¤ÀÏ ¹× »ý¼ºÀÏÀÌ  sysdate -1 º¸´Ù Å« track_id³ª / ted_track¿¡¼­ÀÇ ¼öÁ¤ÀÏ ¹× »ý¼ºÀÏÀÌ  sysdate -1 º¸´Ù Å« track_id ¸¦ Ä¿¼­·Î »ý¼ºÇÑ´Ù. 
+    --////////////ted_track_wì—ì„œì˜ ìˆ˜ì •ì¼ ë° ìƒì„±ì¼ì´  sysdate -1 ë³´ë‹¤ í° track_idë‚˜ / ted_trackì—ì„œì˜ ìˆ˜ì •ì¼ ë° ìƒì„±ì¼ì´  sysdate -1 ë³´ë‹¤ í° track_id ë¥¼ ì»¤ì„œë¡œ ìƒì„±í•œë‹¤. 
     CURSOR cur_track (c_time_offset NUMBER) IS
         SELECT DISTINCT a.TRACK_ID FROM ted_track_w@cfeel a, ted_trackartist@cfeel b
         WHERE a.nation_cd = 'VNM' AND a.track_id = b.track_id
@@ -378,7 +378,7 @@ BEGIN
         */
     END;
     -- ARTIST
-    --////////////¾ÆÆ¼½ºÆ® ±âº»Á¤º¸¸¸ 
+    --////////////ì•„í‹°ìŠ¤íŠ¸ ê¸°ë³¸ì •ë³´ë§Œ 
     BEGIN
         MERGE INTO artist a
         USING (
@@ -403,7 +403,7 @@ BEGIN
             b.homepage_url, b.act_start_ymd, b.act_end_ymd, b.crt_dt, b.status);
         
         
-        ---////////////¾ÆÆ¼½ºÆ®ÀÇ  ¼­ºñ½º±¹°¡Á¤º¸ ¹× ÇØ´ç±¹°¡¿¡ ¼­ºñ½ºÇÒÁö. 
+        ---////////////ì•„í‹°ìŠ¤íŠ¸ì˜  ì„œë¹„ìŠ¤êµ­ê°€ì •ë³´ ë° í•´ë‹¹êµ­ê°€ì— ì„œë¹„ìŠ¤í• ì§€. 
         MERGE INTO artist_local a
         USING (
             SELECT 
@@ -439,7 +439,7 @@ BEGIN
     END;
     
     -- ALBUM
-    --////////////¾Ù¹ü  ±âº»Á¤º¸¸¸ 
+    --////////////ì•¨ë²”  ê¸°ë³¸ì •ë³´ë§Œ 
     BEGIN
         MERGE INTO album a
         USING (
@@ -472,7 +472,7 @@ BEGIN
             INSERT (album_id,title,search_title,artist_id,nation_cd,release_ymd,keyword,album_tp,crt_dt,status, agency_id)
             VALUES (b.album_id, b.title, b.search_title, b.artist_id, b.nation_cd, b.release_ymd, b.search_title, b.album_type, b.crt_dt, b.status, m_agency_id);
         
-        --////////////¾Ù¹ü  ¼­ºñ½º±¹°¡Á¤º¸ ¹× ÇØ´ç±¹°¡¿¡ ¼­ºñ½ºÇÒÁö.  
+        --////////////ì•¨ë²”  ì„œë¹„ìŠ¤êµ­ê°€ì •ë³´ ë° í•´ë‹¹êµ­ê°€ì— ì„œë¹„ìŠ¤í• ì§€.  
         MERGE INTO album_local a
         USING (
             SELECT album_id, title, crt_dt, decode(db_sts, 'A', 'OK', 'BLIND') as status, nation_cd as local_cd
@@ -497,7 +497,7 @@ BEGIN
     FOR rec_track IN cur_track(m_time_offset) LOOP
     BEGIN
     
-     --////////////Æ®·¢  ±âº»Á¤º¸¸¸
+     --////////////íŠ¸ëž™  ê¸°ë³¸ì •ë³´ë§Œ
         MERGE INTO track a
         USING (
             SELECT
@@ -524,7 +524,7 @@ BEGIN
                 b.album_id, b.artist_id, b.svc_128_yn, b.svc_192_yn, b.svc_320_yn, b.svc_mmp3_yn, b.svc_flac_yn, b.svc_wave_yn, b.status);
                 
                 
-        --////////////Æ®·¢   ¼­ºñ½º±¹°¡Á¤º¸ ¹× ÇØ´ç±¹°¡¿¡ ¼­ºñ½ºÇÒÁö.  ¹× ±Ç¸® 
+        --////////////íŠ¸ëž™   ì„œë¹„ìŠ¤êµ­ê°€ì •ë³´ ë° í•´ë‹¹êµ­ê°€ì— ì„œë¹„ìŠ¤í• ì§€.  ë° ê¶Œë¦¬ 
         MERGE INTO track_local a
         USING (
             SELECT track_id, nation_cd as local_cd, track_title, crt_dt, 
@@ -597,13 +597,13 @@ BEGIN
     dbms_output.put_line(m_time_offset);
     BEGIN
     
-    --///////////ted_mvtrack¿¡¼­ db_sts°¡ DÀÌ¸é ÇØ´ç mv´Â BLINDÃ³¸®ÇÑ´Ù. 
+    --///////////ted_mvtrackì—ì„œ db_stsê°€ Dì´ë©´ í•´ë‹¹ mvëŠ” BLINDì²˜ë¦¬í•œë‹¤. 
         UPDATE wmeta.mv a
         SET status = 'BLIND', upd_dt = SYSDATE
         WHERE EXISTS(SELECT 1 FROM ted_mvtrack@cfeel b 
             WHERE a.mv_id = b.mv_id AND a.track_id = b.track_id AND b.db_sts = 'D' AND b.upd_dt > trunc(SYSDATE + m_time_offset));
 
-     --////////////¹Âºñ   ±âº»Á¤º¸¸¸        
+     --////////////ë®¤ë¹„   ê¸°ë³¸ì •ë³´ë§Œ        
         MERGE INTO mv a
         USING (
             SELECT
@@ -644,7 +644,7 @@ BEGIN
         --dbms_output.put_line(rec_mv.mv_id);
  
  
-      --////////////¹Âºñ   ¼­ºñ½º±¹°¡Á¤º¸ ¹× ÇØ´ç±¹°¡¿¡ ¼­ºñ½ºÇÒÁö.  ¹× ±Ç¸®            
+      --////////////ë®¤ë¹„   ì„œë¹„ìŠ¤êµ­ê°€ì •ë³´ ë° í•´ë‹¹êµ­ê°€ì— ì„œë¹„ìŠ¤í• ì§€.  ë° ê¶Œë¦¬            
         MERGE INTO mv_local a
         USING (
             SELECT aa.mv_id, nation_cd as local_cd, mv_title, crt_dt, decode(db_sts, 'A', 'OK', 'BLIND') as status
@@ -661,7 +661,7 @@ BEGIN
             VALUES (b.mv_id, 'VNM', b.mv_title, b.crt_dt, b.status);
     END;
     
-    --///////±Ç¸® Å×ÀÌºí¿¡¼­ ÇØ´ç ¾Ù¹üÀÇ ´Ù¿î·Îµå ½ºÆ®¸®¹Ö ±Ç¸®°¡ ÇÑ°³µµ ¾øÀ¸¸é BLINDÃ³¸®ÇÑ´Ù. 
+    --///////ê¶Œë¦¬ í…Œì´ë¸”ì—ì„œ í•´ë‹¹ ì•¨ë²”ì˜ ë‹¤ìš´ë¡œë“œ ìŠ¤íŠ¸ë¦¬ë° ê¶Œë¦¬ê°€ í•œê°œë„ ì—†ìœ¼ë©´ BLINDì²˜ë¦¬í•œë‹¤. 
     BEGIN
         UPDATE album_local a
         SET status = 'BLIND', upd_dt = sysdate
@@ -714,7 +714,7 @@ BEGIN
             AND (crt_dt > m_target_dt OR upd_dt > m_target_dt)
         );
 
-  -----2010.10.10. colasarang--Ãß°¡---      
+  -----2010.10.10. colasarang--ì¶”ê°€---      
     BEGIN
         UPDATE album_local a
         SET status = 'BLIND', upd_dt = sysdate
@@ -736,7 +736,7 @@ END vnm_rights_sync;
 PROCEDURE jpn_meta_sync(p_time_offset NUMBER)
 IS
 --#################################################################
---##########¹Ýµå½Ã   service_id¿Í agency_idÈ®ÀÎÇÏ±â#############$$$$$$$$$$$$$$$$$------
+--##########ë°˜ë“œì‹œ   service_idì™€ agency_idí™•ì¸í•˜ê¸°#############$$$$$$$$$$$$$$$$$------
 --#################################################################
     m_time_offset NUMBER;
     m_agency_id NUMBER := 20382; 
@@ -758,7 +758,7 @@ BEGIN
     END IF;
     
     
-    --AGENCY 20382 ÀÏº»Áö»ç °íÁ¤ 
+    --AGENCY 20382 ì¼ë³¸ì§€ì‚¬ ê³ ì • 
     
     --GENRE
     BEGIN
@@ -1110,9 +1110,9 @@ END jpn_meta_sync;
 PROCEDURE jpn_rights_sync(p_time_offset NUMBER)
 IS
     /*
-        716	ÀÏº»½ºÆ®¸®¹Ö
-        717	ÀÏº»´Ù¿î·Îµå
-        718	ÀÏº»ÀÓ´ëÁ¦
+        716	ì¼ë³¸ìŠ¤íŠ¸ë¦¬ë°
+        717	ì¼ë³¸ë‹¤ìš´ë¡œë“œ
+        718	ì¼ë³¸ìž„ëŒ€ì œ
     */
     m_str_svc_id NUMBER := 716; 
     m_dnl_svc_id NUMBER := 717;
@@ -1159,7 +1159,7 @@ BEGIN
             AND (crt_dt > m_target_dt OR upd_dt > m_target_dt)
         );
         
-  -----2010.10.10. colasarang--Ãß°¡---  
+  -----2010.10.10. dbmaster added---  
     BEGIN
         UPDATE album_local a
         SET status = 'BLIND', upd_dt = sysdate
