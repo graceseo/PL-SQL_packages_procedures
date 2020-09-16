@@ -26,11 +26,11 @@ IS
 BEGIN
 
 IF P_LOGIN_TP='M' THEN 
---Á¤ÇØÁø ÆĞÅÏÀÌ ¾øÀ¸¸é ¿¹¿ÜÃ³¸®ÇÑ´Ù.
+--ì •í•´ì§„ íŒ¨í„´ì´ ì—†ìœ¼ë©´ ì˜ˆì™¸ì²˜ë¦¬í•œë‹¤.
         if (REGEXP_SUBSTR (p_sso,'i[Pp]hone\s|i[Pp]od\s|i[Pp]ad\s|[Aa]ndroid\s|[Ww]indows mobile\s') is null) 
            or  REGEXP_SUBSTR(p_sso,'^Bugs\s')  is null then
                 mm_exception:=P_SSO;
-                --update·Î º¯°æÇÏ±â!!
+
                 insert into tlg_login_log (msrl,sso_srl,login_ip1,login_tp,login_dt,widget_ref,m_exception) 
                                           values (P_MSRL,P_SSO_SRL,P_LOGIN_IP,P_LOGIN_TP,to_char(sysdate,'yyyymmddhh24miss'),P_WIDGET_REF,mm_exception);
                 commit;
@@ -38,7 +38,7 @@ IF P_LOGIN_TP='M' THEN
         end if;
  
  
- --Ã¹±ÛÂ¥°¡ Bugs¿Í°ø¹éÀÌ¸é BugsºÎÅÍ  ¸ğµç¹®ÀÚ/¼ıÀÚ Á¦¿ÜÇÑ ÅØ½ºÆ®¸¸ ³Ö´Â´Ù.(°ø¹é ¹× / µî Æ¯¼ö¹®ÀÚ) 
+ --ì²«ê¸€ì§œê°€ Bugsì™€ê³µë°±ì´ë©´ Bugsë¶€í„°  ëª¨ë“ ë¬¸ì/ìˆ«ì ì œì™¸í•œ í…ìŠ¤íŠ¸ë§Œ ë„£ëŠ”ë‹¤.(ê³µë°± ë° / ë“± íŠ¹ìˆ˜ë¬¸ì) 
         if REGEXP_SUBSTR(p_sso,'^Bugs ') is not null  then
                 m_lenght:=length(p_sso);
                 m_p_sso:=substr(p_sso,6,m_lenght) ;
@@ -49,26 +49,25 @@ IF P_LOGIN_TP='M' THEN
                 m_p_sso:=regexp_replace(p_sso,'(, )',',');
         end if;
  
---bugs app ¹öÀüÁ¤º¸ ³Ö±â  =>Bugs¸¦ Àß¶ó³»°í Ã¹±ÛÀÚºÎÅÍ (°¡ ³ª¿Ã¶§±îÁöÀÇ °ªÀ»  °¡Á®¿Â´Ù 
+--bugs app ë²„ì „ì •ë³´ ë„£ê¸°  =>Bugsë¥¼ ì˜ë¼ë‚´ê³  ì²«ê¸€ìë¶€í„° (ê°€ ë‚˜ì˜¬ë•Œê¹Œì§€ì˜ ê°’ì„  ê°€ì ¸ì˜¨ë‹¤ 
         app_ver:=substr(m_p_sso,1,(instr(m_p_sso,'('))-2) ;
         m_p_sso:=substr(m_p_sso,(instr(m_p_sso,'('))+1,m_lenght);
         --dbms_output.put_line(app_ver||'test');
         --dbms_output.put_line(m_p_sso);
         
 
---ÆĞÅÏÀÌ android³ª windw¸é ±× ÀÌ¸§ ±×´ë·Î »ç¿ëÇÏ°í  ios°ü·ÃÀÌ¸é ios·Î ³Ö´Â´Ù.
---°¢ osº°·ç ÆĞÅÏÀ» Àß¶ó³½´Ù.
+
 --android
         if REGEXP_SUBSTR(m_p_sso,'[Aa]ndroid') is not null then
 
                 platform_nm:=REGEXP_SUBSTR(m_p_sso,'[Aa]ndroid');
                 --dbms_output.put_line(platform_nm); 
 
-                -- µŞ°¡·Î )¸¦ °ø¹éÃ³¸®ÇÑ´Ù.
+                -- ë’·ê°€ë¡œ )ë¥¼ ê³µë°±ì²˜ë¦¬í•œë‹¤.
                 m_p_sso:=REGEXP_REPLACE(m_p_sso,'[)]','');
-                --dbms_output.put_line('°ø¹é'||m_p_sso); 
+                --dbms_output.put_line('ê³µë°±'||m_p_sso); 
 
-                --ÄŞ¸¶¸¦ ±¸ºĞÀÚ·Î splitÈÄ  ³ª´¶ rowµéÀ» ÇÏ³ª¾¿ ºÒ·¯¿Â´Ù.
+                --ì½¤ë§ˆë¥¼ êµ¬ë¶„ìë¡œ splití›„  ë‚˜ë‰œ rowë“¤ì„ í•˜ë‚˜ì”© ë¶ˆëŸ¬ì˜¨ë‹¤.
                 FOR REC IN (SELECT substr(wdata,
                                                         instr(wdata, ',', 1, LEVEL) + 1,
                                                         instr(wdata, ',', 1, LEVEL + 1) - instr(wdata, ',', 1, LEVEL) - 1)var 
